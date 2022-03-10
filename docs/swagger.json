@@ -1,0 +1,125 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a Survey Voting API",
+        "title": "Survey Voting API",
+        "contact": {
+            "name": "Matthew Croft",
+            "url": "https://www.linkedin.com/in/matthew-croft-44a5a5b3/"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/votecard": {
+            "post": {
+                "description": "Creates a VoteCard that can be used in a survey",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create VoteCard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.votecard"
+                        }
+                    }
+                }
+            }
+        },
+        "/votecard/{id}": {
+            "get": {
+                "description": "Returns a VoteCard",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get VoteCard",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "VoteCard ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.votecard"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates count for a certain option in the VoteCard",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update count on a VoteCard",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "VoteCard ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Option to update vote for",
+                        "name": "option",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.votecard"
+                        }
+                    },
+                    "404": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.votecard": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "votes": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

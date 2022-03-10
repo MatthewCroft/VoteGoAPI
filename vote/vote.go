@@ -4,6 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/gin-swagger" // gin-swagger middleware
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+	// swagger embed files
 )
 
 // VoteCard represents data about votes
@@ -24,17 +27,34 @@ func setupRouter() *gin.Engine {
 	router.GET("/votecard/:id", getVoteCardById)
 	router.PUT("/votecard/:id", updateVoteCount)
 	router.POST("/votecard", createVoteCard)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
 
+// @title           Survey Voting API
+// @version         1.0
+// @description     This is a Survey Voting API
+// @contact.name   Matthew Croft
+// @contact.url    https://www.linkedin.com/in/matthew-croft-44a5a5b3/
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /
 func main() {
 	router := setupRouter()
 
 	router.Run("localhost:8080")
 }
 
-// returning vote card
+// GetVoteCard godoc
+// @Summary		Get VoteCard
+// @Description Returns a VoteCard
+// @Produce		json
+// @Param		id		path	int		true	"VoteCard ID"
+// @Success		200	{object}	votecard
+// @Router       /votecard/{id} [get]
 func getVoteCardById(c *gin.Context) {
 	id := c.Param("id")
 
@@ -47,7 +67,13 @@ func getVoteCardById(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "vote card not found"})
 }
 
-// create vote card
+// CreateVoteCard godoc
+// @Summary		Create VoteCard
+// @Description Creates a VoteCard that can be used in a survey
+// @Accept		json
+// @Produce		json
+// @Success		200 {object}	votecard
+// @Router       /votecard [post]
 func createVoteCard(c *gin.Context) {
 	var newVoteCard votecard
 
@@ -59,7 +85,16 @@ func createVoteCard(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newVoteCard)
 }
 
-// update votes
+// UpdateVoteCount godoc
+// @Summary		Update count on a VoteCard
+// @Description Updates count for a certain option in the VoteCard
+// @Accept		json
+// @Produce		json
+// @Param		id		path	int		true	"VoteCard ID"
+// @Param		option	query	string	true	"Option to update vote for"
+// @Success		200 {object}	main.votecard
+// @Failure		404
+// @Router       /votecard/{id} [put]
 func updateVoteCount(c *gin.Context) {
 	option := c.Query("option")
 	id := c.Param("id")

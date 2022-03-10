@@ -1,0 +1,83 @@
+basePath: /
+definitions:
+  main.votecard:
+    properties:
+      id:
+        type: string
+      options:
+        items:
+          type: string
+        type: array
+      votes:
+        additionalProperties:
+          type: integer
+        type: object
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: Matthew Croft
+    url: https://www.linkedin.com/in/matthew-croft-44a5a5b3/
+  description: This is a Survey Voting API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Survey Voting API
+  version: "1.0"
+paths:
+  /votecard:
+    post:
+      consumes:
+      - application/json
+      description: Creates a VoteCard that can be used in a survey
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.votecard'
+      summary: Create VoteCard
+  /votecard/{id}:
+    get:
+      description: Returns a VoteCard
+      parameters:
+      - description: VoteCard ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.votecard'
+      summary: Get VoteCard
+    put:
+      consumes:
+      - application/json
+      description: Updates count for a certain option in the VoteCard
+      parameters:
+      - description: VoteCard ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Option to update vote for
+        in: query
+        name: option
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.votecard'
+        "404":
+          description: ""
+      summary: Update count on a VoteCard
+swagger: "2.0"
