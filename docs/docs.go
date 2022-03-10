@@ -33,6 +33,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Create VoteCard",
+                "parameters": [
+                    {
+                        "description": "Create VoteCard request body",
+                        "name": "createVoteCardRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CreateVoteCardRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -65,6 +76,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/main.votecard"
                         }
+                    },
+                    "404": {
+                        "description": ""
                     }
                 }
             },
@@ -108,6 +122,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.CreateVoteCardRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "main.votecard": {
             "type": "object",
             "properties": {

@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  main.CreateVoteCardRequest:
+    properties:
+      id:
+        type: string
+      options:
+        items:
+          type: string
+        type: array
+    type: object
   main.votecard:
     properties:
       id:
@@ -30,6 +39,13 @@ paths:
       consumes:
       - application/json
       description: Creates a VoteCard that can be used in a survey
+      parameters:
+      - description: Create VoteCard request body
+        in: body
+        name: createVoteCardRequest
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateVoteCardRequest'
       produces:
       - application/json
       responses:
@@ -54,6 +70,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/main.votecard'
+        "404":
+          description: ""
       summary: Get VoteCard
     put:
       consumes:

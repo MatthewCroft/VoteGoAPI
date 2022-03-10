@@ -21,11 +21,19 @@ var exampleVoteCard = []byte(`{
 	}
 }`)
 
+var createVoteCardRequest = []byte(`{
+	"id": "1",
+	"options": [
+		"option1",
+		"option2"
+	]
+}`)
+
 func TestCreateVoteCard(t *testing.T) {
 	router := setupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(exampleVoteCard))
+	req, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(createVoteCardRequest))
 
 	router.ServeHTTP(w, req)
 
@@ -39,7 +47,7 @@ func TestGetVoteCardById(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	r := httptest.NewRecorder()
-	req1, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(exampleVoteCard))
+	req1, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(createVoteCardRequest))
 	// req2, _ := http.NewRequest("PUT", "/votecard/1?option=option1", nil)
 	req2, _ := http.NewRequest("GET", "/votecard/1", nil)
 
@@ -69,7 +77,7 @@ func TestUpdateVoteCount(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	r := httptest.NewRecorder()
-	req1, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(exampleVoteCard))
+	req1, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(createVoteCardRequest))
 	req2, _ := http.NewRequest("PUT", "/votecard/1?option=option1", nil)
 
 	router.ServeHTTP(w, req1)
@@ -91,9 +99,24 @@ func TestUpdateVoteCount(t *testing.T) {
 }
 
 func TestUpdateVoteCountThrowsNotFoundVoteCard(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req1, _ := http.NewRequest("PUT", "/votecard/7?option=option1", nil)
 
+	router.ServeHTTP(w, req1)
+
+	require.JSONEq(t, `{"message": "vote card not found"}`, w.Body.String())
 }
 
 func TestUpdateVoteCountThrowsNotFoundOption(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	r := httptest.NewRecorder()
+	req1, _ := http.NewRequest("POST", "/votecard", bytes.NewBuffer(createVoteCardRequest))
+	invalidOptionRequest, _ := http.NewRequest("PUT", "/votecard/1?option=option7", nil)
 
+	router.ServeHTTP(w, req1)
+	router.ServeHTTP(r, invalidOptionRequest)
+
+	require.JSONEq(t, `{"message": "not a valid option"}`, r.Body.String())
 }

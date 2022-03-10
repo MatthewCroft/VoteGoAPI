@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/gin-swagger" // gin-swagger middleware
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	// swagger embed files
 )
@@ -14,6 +14,11 @@ type votecard struct {
 	ID      string         `json:"id"`
 	OPTIONS []string       `json:"options"`
 	VOTES   map[string]int `json:"votes"`
+}
+
+type CreateVoteCardRequest struct {
+	ID      string   `json:"id"`
+	OPTIONS []string `json:"options"`
 }
 
 // hold votecards in memory for now
@@ -54,6 +59,7 @@ func main() {
 // @Produce		json
 // @Param		id		path	int		true	"VoteCard ID"
 // @Success		200	{object}	votecard
+// @Failure		404
 // @Router       /votecard/{id} [get]
 func getVoteCardById(c *gin.Context) {
 	id := c.Param("id")
@@ -72,14 +78,22 @@ func getVoteCardById(c *gin.Context) {
 // @Description Creates a VoteCard that can be used in a survey
 // @Accept		json
 // @Produce		json
+// @Param		createVoteCardRequest	body	CreateVoteCardRequest	true	"Create VoteCard request body"
 // @Success		200 {object}	votecard
 // @Router       /votecard [post]
 func createVoteCard(c *gin.Context) {
-	var newVoteCard votecard
+	var newVoteCardRequest CreateVoteCardRequest
+	optionMap := make(map[string]int)
 
-	if err := c.BindJSON(&newVoteCard); err != nil {
+	if err := c.BindJSON(&newVoteCardRequest); err != nil {
 		return
 	}
+
+	for _, option := range newVoteCardRequest.OPTIONS {
+		optionMap[option] = 0
+	}
+
+	var newVoteCard = votecard{ID: newVoteCardRequest.ID, OPTIONS: newVoteCardRequest.OPTIONS, VOTES: optionMap}
 
 	votecards = append(votecards, newVoteCard)
 	c.IndentedJSON(http.StatusCreated, newVoteCard)
@@ -92,7 +106,7 @@ func createVoteCard(c *gin.Context) {
 // @Produce		json
 // @Param		id		path	int		true	"VoteCard ID"
 // @Param		option	query	string	true	"Option to update vote for"
-// @Success		200 {object}	main.votecard
+// @Success		200 {object}	votecard
 // @Failure		404
 // @Router       /votecard/{id} [put]
 func updateVoteCount(c *gin.Context) {
