@@ -48,7 +48,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.votecard"
+                            "$ref": "#/definitions/main.VoteCard"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect request body",
+                        "schema": {
+                            "$ref": "#/definitions/main.HttpErrorMessage"
                         }
                     }
                 }
@@ -74,11 +80,14 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.votecard"
+                            "$ref": "#/definitions/main.VoteCard"
                         }
                     },
                     "404": {
-                        "description": ""
+                        "description": "VoteCard not found",
+                        "schema": {
+                            "$ref": "#/definitions/main.HttpErrorMessage"
+                        }
                     }
                 }
             },
@@ -111,11 +120,20 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.votecard"
+                            "$ref": "#/definitions/main.VoteCard"
+                        }
+                    },
+                    "400": {
+                        "description": "Not a valid option",
+                        "schema": {
+                            "$ref": "#/definitions/main.HttpErrorMessage"
                         }
                     },
                     "404": {
-                        "description": ""
+                        "description": "VoteCard not found",
+                        "schema": {
+                            "$ref": "#/definitions/main.HttpErrorMessage"
+                        }
                     }
                 }
             }
@@ -136,7 +154,15 @@ const docTemplate = `{
                 }
             }
         },
-        "main.votecard": {
+        "main.HttpErrorMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.VoteCard": {
             "type": "object",
             "properties": {
                 "id": {

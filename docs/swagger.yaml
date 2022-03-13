@@ -9,7 +9,12 @@ definitions:
           type: string
         type: array
     type: object
-  main.votecard:
+  main.HttpErrorMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  main.VoteCard:
     properties:
       id:
         type: string
@@ -52,7 +57,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.votecard'
+            $ref: '#/definitions/main.VoteCard'
+        "400":
+          description: Incorrect request body
+          schema:
+            $ref: '#/definitions/main.HttpErrorMessage'
       summary: Create VoteCard
   /votecard/{id}:
     get:
@@ -69,9 +78,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.votecard'
+            $ref: '#/definitions/main.VoteCard'
         "404":
-          description: ""
+          description: VoteCard not found
+          schema:
+            $ref: '#/definitions/main.HttpErrorMessage'
       summary: Get VoteCard
     put:
       consumes:
@@ -94,8 +105,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.votecard'
+            $ref: '#/definitions/main.VoteCard'
+        "400":
+          description: Not a valid option
+          schema:
+            $ref: '#/definitions/main.HttpErrorMessage'
         "404":
-          description: ""
+          description: VoteCard not found
+          schema:
+            $ref: '#/definitions/main.HttpErrorMessage'
       summary: Update count on a VoteCard
 swagger: "2.0"

@@ -10,7 +10,7 @@ import (
 )
 
 // VoteCard represents data about votes
-type votecard struct {
+type VoteCard struct {
 	ID      string         `json:"id"`
 	OPTIONS []string       `json:"options"`
 	VOTES   map[string]int `json:"votes"`
@@ -21,8 +21,12 @@ type CreateVoteCardRequest struct {
 	OPTIONS []string `json:"options"`
 }
 
+type HttpErrorMessage struct {
+	MESSAGE string `json:"message"`
+}
+
 // hold votecards in memory for now
-var votecards = []votecard{}
+var votecards = []VoteCard{}
 
 func setupRouter() *gin.Engine {
 	// Creates a gin router with default middleware:
@@ -58,8 +62,8 @@ func main() {
 // @Description Returns a VoteCard
 // @Produce		json
 // @Param		id		path	int		true	"VoteCard ID"
-// @Success		200	{object}	votecard
-// @Failure		404
+// @Success		200	{object}	VoteCard
+// @Failure		404 {object} 	HttpErrorMessage "VoteCard not found"
 // @Router       /votecard/{id} [get]
 func getVoteCardById(c *gin.Context) {
 	id := c.Param("id")
@@ -70,7 +74,7 @@ func getVoteCardById(c *gin.Context) {
 			return
 		}
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "vote card not found"})
+	c.IndentedJSON(http.StatusNotFound, HttpErrorMessage{MESSAGE: "vote card not found"})
 }
 
 // CreateVoteCard godoc
@@ -79,13 +83,15 @@ func getVoteCardById(c *gin.Context) {
 // @Accept		json
 // @Produce		json
 // @Param		createVoteCardRequest	body	CreateVoteCardRequest	true	"Create VoteCard request body"
-// @Success		200 {object}	votecard
+// @Success		200 {object}	VoteCard
+// @Failure		400 {object}	HttpErrorMessage	"Incorrect request body"
 // @Router       /votecard [post]
 func createVoteCard(c *gin.Context) {
 	var newVoteCardRequest CreateVoteCardRequest
 	optionMap := make(map[string]int)
 
 	if err := c.BindJSON(&newVoteCardRequest); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, HttpErrorMessage{MESSAGE: "incorrect request body, should be VoteCard body"})
 		return
 	}
 
@@ -93,7 +99,7 @@ func createVoteCard(c *gin.Context) {
 		optionMap[option] = 0
 	}
 
-	var newVoteCard = votecard{ID: newVoteCardRequest.ID, OPTIONS: newVoteCardRequest.OPTIONS, VOTES: optionMap}
+	var newVoteCard = VoteCard{ID: newVoteCardRequest.ID, OPTIONS: newVoteCardRequest.OPTIONS, VOTES: optionMap}
 
 	votecards = append(votecards, newVoteCard)
 	c.IndentedJSON(http.StatusCreated, newVoteCard)
@@ -106,13 +112,14 @@ func createVoteCard(c *gin.Context) {
 // @Produce		json
 // @Param		id		path	int		true	"VoteCard ID"
 // @Param		option	query	string	true	"Option to update vote for"
-// @Success		200 {object}	votecard
-// @Failure		404
+// @Success		200 {object}	VoteCard
+// @Failure		404 {object}	HttpErrorMessage	"VoteCard not found"
+// @Failure		400	{object}	HttpErrorMessage	"Not a valid option"
 // @Router       /votecard/{id} [put]
 func updateVoteCount(c *gin.Context) {
 	option := c.Query("option")
 	id := c.Param("id")
-	var updateVoteCard = votecard{}
+	var updateVoteCard = VoteCard{}
 
 	for _, votecard := range votecards {
 		if votecard.ID == id {
@@ -121,7 +128,7 @@ func updateVoteCount(c *gin.Context) {
 	}
 
 	if updateVoteCard.ID == "" {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "vote card not found"})
+		c.IndentedJSON(http.StatusNotFound, HttpErrorMessage{MESSAGE: "vote card not found"})
 		return
 	}
 
@@ -133,5 +140,5 @@ func updateVoteCount(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "not a valid option"})
+	c.IndentedJSON(http.StatusNotFound, HttpErrorMessage{MESSAGE: "not a valid option"})
 }
